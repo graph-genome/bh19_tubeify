@@ -8,6 +8,18 @@ const program = require('commander')
 const tubeify = require('./dist/index.js')
 const fs = require('fs')
 
+// This is a testing method.
+/*
+let tubes = new tubeify.Tubeify(30, 300, 1000);
+console.log(tubes.tiles_range);
+console.log(tubes.tiles(0)) // 0
+console.log(tubes.tiles(1)) // 0
+console.log(tubes.tiles(9)) // 0
+console.log(tubes.tiles(10)) //1
+console.log(tubes.tiles(11)) //1
+console.log(tubes.tiles(290)) //29
+console.log(tubes.tiles(300)) //289
+*/
 program
     .option('-b, --bins <bins>', '# of bins are provided in total')
     .option('-t, --tiles <tiles>', '# of tiles, default: -1 (one bin equals one tile)')
