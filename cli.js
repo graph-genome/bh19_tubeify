@@ -27,5 +27,6 @@ data.forEach(item => {
     item.next_bin = JSON.parse(item["next.bin"])
 });
 let tube = new tubeify.Tubeify(parseInt(program.tiles), parseInt(program.bins), parseInt(program.bin_length));
+// let tube = new tubeify.Tubeify(30, 300, 1000); For given 300 bins, we would like to have 30 tiles.
 let json = tube.tubeify(data);
 console.log(JSON.stringify(json))
