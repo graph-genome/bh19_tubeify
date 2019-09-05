@@ -1,0 +1,31 @@
+{
+  "name": "tubeify",
+  "version": "1.0.0",
+  "description": "Tubeify Library",
+  "main": "dist/index.js",
+  "umd:main": "dist/index.umd.js",
+  "module": "dist/index.m.js",
+  "source": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error no test specified\" && exit 1",
+    "dev": "microbundle watch",
+    "build": "microbundle"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graph-genome/bh19_tubeify.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/graph-genome/bh19_tubeify/issues"
+  },
+  "homepage": "https://github.com/graph-genome/bh19_tubeify#readme",
+  "devDependencies": {
+    "microbundle": "^0.11.0"
+  },
+  "dependencies": {
+    "commander": "^3.0.1",
+    "csv-parse": "^4.4.5"
+  }
+}
