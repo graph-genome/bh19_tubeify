@@ -115,12 +115,15 @@ export class Tubeify {
 
 
         let previous_id = -1;
+        let path_unique_id = -1;
         let previous_bin = -1;
         bin_json.forEach(bin => {
             bin.begins.forEach((begin, index) => {
+                // let index = 0;
                 if (previous_bin !== bin.path_name) {
                     previous_id = 0;
                     previous_bin = bin.path_name;
+                    path_unique_id += 1;
                 } else {
                     previous_id += 1;
                 }
@@ -129,12 +132,12 @@ export class Tubeify {
                     mismatches: []
                 }];
                 // console.log(bin)
-                if (bin.begins[index][0] !== bin.bin_id - 1 && bin.begins[index][0] !== -1) {
+                if (bin.begins[index][0] + 1 !== bin.bin_id - 1 && bin.begins[index][0] !== -1) {
                     sequence_new[0].mismatches.push({
                         type: "link", pos: 0, seq: "L", query: bin.begins[index][0] + 1 // Dirty fix
                     });
                 }
-                if (bin.ends[index][0] !== bin.bin_id + 1 && bin.ends[index][0] !== -1) {
+                if (bin.ends[index][0] + 1 !== bin.bin_id + 1 && bin.ends[index][0] !== -1) {
                     sequence_new[0].mismatches.push({
                         type: "link", pos: this.bin_length, seq: "L", query: bin.ends[index][0] + 1 // Dirty fix
                     });
@@ -147,11 +150,55 @@ export class Tubeify {
                     sequence: [String(bin.bin_id)],
                     sequenceNew: sequence_new,
                     type: "read",
-                    name: bin.path_name,
-                    id: previous_id
+                    read_id: previous_id,
+                    name: bin.path_name, // + ":" + String(previous_id),
+                    id: path_unique_id,
                 });
             })
         })
+
+        // Merging nodes:
+        let previous_read_id = -1;
+        let previous_path_unique_id = -1;
+        let previous_reads = [];
+        let new_reads = []
+        reads.forEach(read => {
+            if ((read.id !== previous_path_unique_id || parseInt(read.sequence[0]) !== previous_read_id + 1) && previous_reads.length > 0) {
+                new_reads.push({
+                    firstNodeOffset: 0,
+                    finalNodeCoverLength: previous_reads.length,
+                    mapping_quality: 60,
+                    is_secondary: false,
+                    sequence: previous_reads.map(item => item.sequence[0]),
+                    sequenceNew: previous_reads.map(item => item.sequenceNew[0]),
+                    type: "read",
+                    name: previous_reads[0]["name"],
+                    id: previous_path_unique_id,
+                })
+                previous_path_unique_id = read.id;
+                previous_reads = [read];
+            } else if ((read.id !== previous_path_unique_id || parseInt(read.sequence[0]) !== previous_read_id + 1) ) {
+                previous_path_unique_id = read.id;
+                previous_reads = [read];
+            } else {
+                previous_reads.push(read);
+            }
+            previous_read_id = parseInt(read.sequence[0]);
+        })
+        if (previous_reads.length > 0) {
+            new_reads.push({
+                firstNodeOffset: 0,
+                finalNodeCoverLength: this.bin_length * previous_reads.length,
+                mapping_quality: 60,
+                is_secondary: false,
+                sequence: previous_reads.map(item => item.sequence[0]),
+                sequenceNew: previous_reads.map(item => item.sequenceNew[0]),
+                type: "read",
+                name: previous_reads[0].name,
+                id: previous_path_unique_id,
+            });
+        }
+        reads = new_reads;
 
         let tubemap_json = {};
         const nodes = Array.from(new Array(this.max_bin)).map((v, i) => { return { name: String(i + 1), sequenceLength: this.bin_length } }
