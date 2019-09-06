@@ -131,12 +131,12 @@ export class Tubeify {
                 // console.log(bin)
                 if (bin.begins[index][0] !== bin.bin_id - 1 && bin.begins[index][0] !== -1) {
                     sequence_new[0].mismatches.push({
-                        type: "link", pos: 0, seq: "LINK", query: bin.begins[index][0]
+                        type: "link", pos: 0, seq: "L", query: bin.begins[index][0] + 1 // Dirty fix
                     });
                 }
                 if (bin.ends[index][0] !== bin.bin_id + 1 && bin.ends[index][0] !== -1) {
                     sequence_new[0].mismatches.push({
-                        type: "link", pos: this.bin_length, seq: "LINK", query: bin.ends[index][0] 
+                        type: "link", pos: this.bin_length, seq: "L", query: bin.ends[index][0] + 1 // Dirty fix
                     });
                 }
                 reads.push({
@@ -157,7 +157,7 @@ export class Tubeify {
         const nodes = Array.from(new Array(this.max_bin)).map((v, i) => { return { name: String(i + 1), sequenceLength: this.bin_length } }
         );
         tubemap_json["nodes"] = nodes;
-        tubemap_json["paths"] = [{ id: 0, name: "REF", sequence: nodes.map(node => node.name) }];
+        tubemap_json["tracks"] = [{ id: 0, name: "REF", sequence: nodes.map(node => node.name) }];
         tubemap_json["reads"] = reads;
 
         return tubemap_json

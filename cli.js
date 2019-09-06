@@ -69,7 +69,7 @@ function callback() {
     let data = global.data
     let input = []
     data.forEach(item => {
-        item.bin_id = parseInt(item.bin_id)
+        item.bin_id = parseInt(item.bin_id) + 1
         // item.begins = JSON.parse(item["begins"])
         // item.ends = JSON.parse(item["ends"])
     });
