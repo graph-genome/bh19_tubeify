@@ -4,13 +4,13 @@ export class Tubeify {
     private bin_length: number; // Nucleotide length of each bins.
     tiles_range: number[]; // e.g. [0, 5, 10, 15, 20] according to max_bin and tile.
 
-    constructor(tile: number, bin_length: number, max_bin?: number) {
+    constructor(tile: number, bin_length: number, max_bin: number) {
         this.tile = tile;
+        this.max_bin = max_bin;
         this.tiles_range = tile === -1 ?
             Array.from(new Array(this.max_bin)).map((v, i) => i) :
             Array.from(new Array(tile)).map((v, i) => Math.round(max_bin * i / tile));
         this.bin_length = bin_length || 0;
-        this.max_bin = Number.isNaN(max_bin) ? -1 : max_bin;
     }
 
     tiles(bin: number) {
@@ -28,11 +28,14 @@ export class Tubeify {
 
 
     tileify(bin_json: any){
-        let matrix = [];
+        let matrix: Read[] = [];
 
         // Create reads for every contiguous segment of bins within a Path
-        bin_json.forEach((path) => { // For one Path
-            let temporary_reads = [];
+        bin_json[0].forEach((
+            path: {"sample_name":string,"path_name":string,"id":number,
+                "bins": number[][], "links": [number,number][]}) =>
+        { // For one Path
+            let temporary_reads: Read[] = [];
             let first_node_offset = 0;
             let previous_bin_id = 0;
 
@@ -62,17 +65,17 @@ export class Tubeify {
                     type: "link", pos: link[1] - temporary_reads[buddy].firstNodeOffset, seq: "L", query: link[0]
                 });
             });
-            matrix.concat(temporary_reads);
+            matrix = matrix.concat(temporary_reads);
         });
 
-        let tubemap_json = {};
-        tubemap_json["nodes"] = [{"name": "Layout", "sequenceLength": this.max_bin}];
-        tubemap_json["tracks"] = [{ id: 0, name: "REF", sequence: ["Layout"] }];
-        tubemap_json["reads"] = matrix;
-
+        let tubemap_json = {
+            nodes: [{"name": "Layout", "sequenceLength": this.max_bin}],
+            tracks: [{ id: 0, name: "REF", sequence: ["Layout"] }],
+            reads: matrix
+        };
         return tubemap_json;
 
-        function newRead(first_node_offset: number, previous_bin_id: number, path_id: number) {
+        function newRead(first_node_offset: number, previous_bin_id: number, path_id: number): Read {
             // Placeholder of sequence_new.
             let stub = {0: {nodeName: "0", mismatches: []}};
 
@@ -88,21 +91,22 @@ export class Tubeify {
                 id: path_id
             };
         }
-        function binary_search(target, sorted_data){
+        function binary_search(target: number, sorted_data: Read[]){
             // d=data, t=target, s=start, e=end, m=middle
-            //d[i][0] is the bin_id we are sorted and searching for
-            const binarySearch = (d, t, s, e) => {
-                const m = Math.floor((s + e)/2);
-                if (t == d[m][0]) return d[m];
-                if (e - 1 === s) return d[e][0] == t ? d[e] : d[s];  //return first read, unless e is exact match
-                if (t > d[m][0]) return binarySearch(d,t,m,e);
-                if (t < d[m][0]) return binarySearch(d,t,s,m);
-            };
+            function binarySearch(d: Read[], t: number, s: number, e: number): number {
+                //d[i][0] is the bin_id we are sorted and searching for
+                const m = Math.floor((s + e) / 2);
+                if (t == d[m].firstNodeOffset || m === e) return m;
+                if (e - 1 === s) return d[e].firstNodeOffset == t ? e : s;  //return first read, unless e is exact match
+                if (t > d[m].firstNodeOffset) return binarySearch(d, t, m, e);
+                if (t < d[m].firstNodeOffset) return binarySearch(d, t, s, m);
+                return -1; // should be unreachable if data is populated
+            }
             return binarySearch(sorted_data, target, 0, sorted_data.length-1)
         }
 
     }
-
+/*
     tubeify(bin_json: any) {
         let reads = [];
         let paths = {};
@@ -222,5 +226,5 @@ export class Tubeify {
 
         return tubemap_json
     }
-
+*/
 }

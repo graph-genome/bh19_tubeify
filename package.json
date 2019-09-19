@@ -22,7 +22,8 @@
   },
   "homepage": "https://github.com/graph-genome/bh19_tubeify#readme",
   "devDependencies": {
-    "microbundle": "^0.11.0"
+    "microbundle": "^0.11.0",
+    "typescript": "^3.6.3"
   },
   "dependencies": {
     "commander": "^3.0.1",

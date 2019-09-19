@@ -1,2 +1,101 @@
-var e=function(e,n,i){this.tile=e,this.tiles_range=-1===e?Array.from(new Array(this.max_bin)).map(function(e,n){return n}):Array.from(new Array(e)).map(function(n,t){return Math.round(i*t/e)}),this.bin_length=n||0,this.max_bin=Number.isNaN(i)?-1:i};e.prototype.tiles=function(e){var n=this.tiles_range.length;return this.tiles_range.forEach(function(i,t){i<=e&&(n=t)}),n},e.prototype.tileify=function(e){e.forEach(function(e){var n=[],r=0,s=0;e.bins.forEach(function(t){t[0]===s+1||(n.push(i(r,s,e.id)),r=t[0]),s=t[0]}),n.push(i(r,s,e.id)),e.links.forEach(function(e){var i=t(e[0],n);n[i].sequenceNew[0].mismatches.push({type:"link",pos:e[0]-n[i].firstNodeOffset,seq:"L",query:e[1]});var r=t(e[1],n);n[r].sequenceNew[0].mismatches.push({type:"link",pos:e[1]-n[r].firstNodeOffset,seq:"L",query:e[0]})})});var n={};return n.nodes=[{name:"Layout",sequenceLength:this.max_bin}],n.tracks=[{id:0,name:"REF",sequence:["Layout"]}],n.reads=[],n;function i(e,n,i){return{firstNodeOffset:e,finalNodeCoverLength:n-e,mapping_quality:60,is_secondary:!1,sequence:["Layout"],sequenceNew:{0:{nodeName:"0",mismatches:[]}},type:"read",read_id:i,id:i}}function t(e,n){var i=function(e,n,t,r){var s=Math.floor((t+r)/2);return n==e[s][0]?e[s]:r-1===t?e[r][0]==n?e[r]:e[t]:n>e[s][0]?i(e,n,s,r):n<e[s][0]?i(e,n,t,s):void 0};return i(n,e,0,n.length-1)}},e.prototype.tubeify=function(e){var n=this,i=[],t={},r=0;e.forEach(function(e){void 0===t[e.name]&&(t[e.name]={}),t[e.name][e.bin_id]=e,r<e.bin_id&&(r=e.bin_id)}),-1===this.max_bin&&(this.max_bin=r);var s=-1,a=-1,u=-1;e.forEach(function(e){e.begins.forEach(function(t,r){u!==e.path_name?(s=0,u=e.path_name,a+=1):s+=1;var o=[{nodeName:String(e.bin_id),mismatches:[]}];e.begins[r][0]+1!==e.bin_id-1&&-1!==e.begins[r][0]&&o[0].mismatches.push({type:"link",pos:0,seq:"L",query:e.begins[r][0]+1}),e.ends[r][0]+1!==e.bin_id+1&&-1!==e.ends[r][0]&&o[0].mismatches.push({type:"link",pos:n.bin_length,seq:"L",query:e.ends[r][0]+1}),i.push({firstNodeOffset:0,finalNodeCoverLength:n.bin_length,mapping_quality:60,is_secondary:!1,sequence:[String(e.bin_id)],sequenceNew:o,type:"read",read_id:s,name:e.path_name,id:a})})});var o=-1,c=-1,f=[],h=[];i.forEach(function(e){(e.id!==c||parseInt(e.sequence[0])!==o+1)&&f.length>0?(h.push({firstNodeOffset:0,finalNodeCoverLength:f.length,mapping_quality:60,is_secondary:!1,sequence:f.map(function(e){return e.sequence[0]}),sequenceNew:f.map(function(e){return e.sequenceNew[0]}),type:"read",name:f[0].name,id:c}),c=e.id,f=[e]):e.id!==c||parseInt(e.sequence[0])!==o+1?(c=e.id,f=[e]):f.push(e),o=parseInt(e.sequence[0])}),f.length>0&&h.push({firstNodeOffset:0,finalNodeCoverLength:this.bin_length*f.length,mapping_quality:60,is_secondary:!1,sequence:f.map(function(e){return e.sequence[0]}),sequenceNew:f.map(function(e){return e.sequenceNew[0]}),type:"read",name:f[0].name,id:c}),i=h;var d={},m=Array.from(new Array(this.max_bin)).map(function(e,i){return{name:String(i+1),sequenceLength:n.bin_length}});return d.nodes=m,d.tracks=[{id:0,name:"REF",sequence:m.map(function(e){return e.name})}],d.reads=i,d},exports.Tubeify=e;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var Tubeify = /** @class */ (function () {
+    function Tubeify(tile, bin_length, max_bin) {
+        this.tile = tile;
+        this.max_bin = max_bin;
+        this.tiles_range = tile === -1 ?
+            Array.from(new Array(this.max_bin)).map(function (v, i) { return i; }) :
+            Array.from(new Array(tile)).map(function (v, i) { return Math.round(max_bin * i / tile); });
+        this.bin_length = bin_length || 0;
+    }
+    Tubeify.prototype.tiles = function (bin) {
+        // Find the tile ID by binary search on tiled_range.
+        // let flag = false; // It should be replaced with a binary search at least.
+        var tile_index = this.tiles_range.length;
+        this.tiles_range.forEach(function (range, i) {
+            if (range <= bin) {
+                tile_index = i;
+                return;
+            }
+        });
+        return tile_index;
+    };
+    Tubeify.prototype.tileify = function (bin_json) {
+        var matrix = [];
+        // Create reads for every contiguous segment of bins within a Path
+        bin_json[0].forEach(function (path) {
+            var temporary_reads = [];
+            var first_node_offset = 0;
+            var previous_bin_id = 0;
+            // Iterate bins and look at id
+            path.bins.forEach(function (bin) {
+                // For each contiguous range, make a Read
+                if (bin[0] === previous_bin_id + 1) { // Contiguous from the previous bin: do nothing
+                }
+                else { // Not contiguous: Create a new read.
+                    temporary_reads.push(newRead(first_node_offset, previous_bin_id, path.id));
+                    first_node_offset = bin[0];
+                }
+                previous_bin_id = bin[0];
+            });
+            temporary_reads.push(newRead(first_node_offset, previous_bin_id, path.id));
+            // Links: inside of one read:   
+            // Input Example:  [ 5, 10]  meaning bins 5 and 10 are connected
+            path["links"].forEach(function (link) {
+                var index = binary_search(link[0], temporary_reads);
+                // Pos uses relative coordinates = first bin_id -  firstNodeOffset
+                temporary_reads[index].sequenceNew[0].mismatches.push({
+                    type: "link", pos: link[0] - temporary_reads[index].firstNodeOffset, seq: "L", query: link[1]
+                });
+                //make second link bidirectional
+                var buddy = binary_search(link[1], temporary_reads);
+                temporary_reads[buddy].sequenceNew[0].mismatches.push({
+                    type: "link", pos: link[1] - temporary_reads[buddy].firstNodeOffset, seq: "L", query: link[0]
+                });
+            });
+            matrix = matrix.concat(temporary_reads);
+        });
+        var tubemap_json = {
+            nodes: [{ "name": "Layout", "sequenceLength": this.max_bin }],
+            tracks: [{ id: 0, name: "REF", sequence: ["Layout"] }],
+            reads: matrix
+        };
+        return tubemap_json;
+        function newRead(first_node_offset, previous_bin_id, path_id) {
+            // Placeholder of sequence_new.
+            var stub = { 0: { nodeName: "0", mismatches: [] } };
+            return {
+                firstNodeOffset: first_node_offset,
+                finalNodeCoverLength: previous_bin_id - first_node_offset,
+                mapping_quality: 60,
+                is_secondary: false,
+                sequence: ["Layout"],
+                sequenceNew: stub,
+                type: "read",
+                read_id: path_id,
+                id: path_id
+            };
+        }
+        function binary_search(target, sorted_data) {
+            // d=data, t=target, s=start, e=end, m=middle
+            function binarySearch(d, t, s, e) {
+                //d[i][0] is the bin_id we are sorted and searching for
+                var m = Math.floor((s + e) / 2);
+                if (t == d[m].firstNodeOffset || m === e)
+                    return m;
+                if (e - 1 === s)
+                    return d[e].firstNodeOffset == t ? e : s; //return first read, unless e is exact match
+                if (t > d[m].firstNodeOffset)
+                    return binarySearch(d, t, m, e);
+                if (t < d[m].firstNodeOffset)
+                    return binarySearch(d, t, s, m);
+                return -1; // should be unreachable if data is populated
+            }
+            return binarySearch(sorted_data, target, 0, sorted_data.length - 1);
+        }
+    };
+    return Tubeify;
+}());
+exports.Tubeify = Tubeify;
 //# sourceMappingURL=index.js.map

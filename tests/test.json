@@ -1,12 +1,1 @@
-[
-{"sample_name":"sue","path_name":"a","id":1,
-  "bins": [[1,"cov","inv","pos"],[2,"cov","inv","pos"],[3,"cov","inv","pos"],[4,"cov","inv","pos"]], "links": [[3,4]]},
-{"sample_name":"sue","path_name":"b","id":2,
-  "bins": [[1,"cov","inv","pos"],[2,"cov","inv","pos"],[4,"cov","inv","pos"]], "links": [[1,4],[2,4]]},
-{"sample_name":"sue","path_name":"c","id":3,
-  "bins": [[1,"cov","inv","pos"],[-3,"cov","inv","pos"],[-2,"cov","inv","pos"],[4,"cov","inv","pos"]], "links": []},
-{"sample_name":"bob","path_name":"d","id":6,
-  "bins": [[3,"cov","inv","pos"],[4,"cov","inv","pos"]], "links": []},
-{"sample_name":"bob","path_name":"e","id":7,
-  "bins": [[1,"cov","inv","pos"],[2,"cov","inv","pos"]], "links": [[2,3]]}
-]
+[{"sample_name":"sue","path_name":"a","id":1,  "bins": [[1,"cov","inv","pos"],[2,"cov","inv","pos"],[3,"cov","inv","pos"],[4,"cov","inv","pos"]], "links": [[3,4]]},{"sample_name":"sue","path_name":"b","id":2,  "bins": [[1,"cov","inv","pos"],[2,"cov","inv","pos"],[4,"cov","inv","pos"]], "links": [[1,4],[2,4]]},{"sample_name":"sue","path_name":"c","id":3,  "bins": [[1,"cov","inv","pos"],[-3,"cov","inv","pos"],[-2,"cov","inv","pos"],[4,"cov","inv","pos"]], "links": []},{"sample_name":"bob","path_name":"d","id":6,  "bins": [[3,"cov","inv","pos"],[4,"cov","inv","pos"]], "links": []},{"sample_name":"bob","path_name":"e","id":7,  "bins": [[1,"cov","inv","pos"],[2,"cov","inv","pos"]], "links": [[2,3]]}]

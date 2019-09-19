@@ -1,0 +1,233 @@
+{
+  "nodes": [
+    {
+      "name": "Layout",
+      "sequenceLength": 4
+    }
+  ],
+  "tracks": [
+    {
+      "id": 0,
+      "name": "REF",
+      "sequence": [
+        "Layout"
+      ]
+    }
+  ],
+  "reads": [
+    {
+      "firstNodeOffset": 0,
+      "finalNodeCoverLength": 4,
+      "mapping_quality": 60,
+      "is_secondary": false,
+      "sequence": [
+        "Layout"
+      ],
+      "sequenceNew": {
+        "0": {
+          "nodeName": "0",
+          "mismatches": [
+            {
+              "type": "link",
+              "pos": 3,
+              "seq": "L",
+              "query": 4
+            },
+            {
+              "type": "link",
+              "pos": 4,
+              "seq": "L",
+              "query": 3
+            }
+          ]
+        }
+      },
+      "type": "read",
+      "read_id": 1,
+      "id": 1
+    },
+    {
+      "firstNodeOffset": 0,
+      "finalNodeCoverLength": 2,
+      "mapping_quality": 60,
+      "is_secondary": false,
+      "sequence": [
+        "Layout"
+      ],
+      "sequenceNew": {
+        "0": {
+          "nodeName": "0",
+          "mismatches": [
+            {
+              "type": "link",
+              "pos": 1,
+              "seq": "L",
+              "query": 4
+            },
+            {
+              "type": "link",
+              "pos": 2,
+              "seq": "L",
+              "query": 4
+            }
+          ]
+        }
+      },
+      "type": "read",
+      "read_id": 2,
+      "id": 2
+    },
+    {
+      "firstNodeOffset": 4,
+      "finalNodeCoverLength": 0,
+      "mapping_quality": 60,
+      "is_secondary": false,
+      "sequence": [
+        "Layout"
+      ],
+      "sequenceNew": {
+        "0": {
+          "nodeName": "0",
+          "mismatches": [
+            {
+              "type": "link",
+              "pos": 0,
+              "seq": "L",
+              "query": 1
+            },
+            {
+              "type": "link",
+              "pos": 0,
+              "seq": "L",
+              "query": 2
+            }
+          ]
+        }
+      },
+      "type": "read",
+      "read_id": 2,
+      "id": 2
+    },
+    {
+      "firstNodeOffset": 0,
+      "finalNodeCoverLength": 1,
+      "mapping_quality": 60,
+      "is_secondary": false,
+      "sequence": [
+        "Layout"
+      ],
+      "sequenceNew": {
+        "0": {
+          "nodeName": "0",
+          "mismatches": []
+        }
+      },
+      "type": "read",
+      "read_id": 3,
+      "id": 3
+    },
+    {
+      "firstNodeOffset": -3,
+      "finalNodeCoverLength": 1,
+      "mapping_quality": 60,
+      "is_secondary": false,
+      "sequence": [
+        "Layout"
+      ],
+      "sequenceNew": {
+        "0": {
+          "nodeName": "0",
+          "mismatches": []
+        }
+      },
+      "type": "read",
+      "read_id": 3,
+      "id": 3
+    },
+    {
+      "firstNodeOffset": 4,
+      "finalNodeCoverLength": 0,
+      "mapping_quality": 60,
+      "is_secondary": false,
+      "sequence": [
+        "Layout"
+      ],
+      "sequenceNew": {
+        "0": {
+          "nodeName": "0",
+          "mismatches": []
+        }
+      },
+      "type": "read",
+      "read_id": 3,
+      "id": 3
+    },
+    {
+      "firstNodeOffset": 0,
+      "finalNodeCoverLength": 0,
+      "mapping_quality": 60,
+      "is_secondary": false,
+      "sequence": [
+        "Layout"
+      ],
+      "sequenceNew": {
+        "0": {
+          "nodeName": "0",
+          "mismatches": []
+        }
+      },
+      "type": "read",
+      "read_id": 6,
+      "id": 6
+    },
+    {
+      "firstNodeOffset": 3,
+      "finalNodeCoverLength": 1,
+      "mapping_quality": 60,
+      "is_secondary": false,
+      "sequence": [
+        "Layout"
+      ],
+      "sequenceNew": {
+        "0": {
+          "nodeName": "0",
+          "mismatches": []
+        }
+      },
+      "type": "read",
+      "read_id": 6,
+      "id": 6
+    },
+    {
+      "firstNodeOffset": 0,
+      "finalNodeCoverLength": 2,
+      "mapping_quality": 60,
+      "is_secondary": false,
+      "sequence": [
+        "Layout"
+      ],
+      "sequenceNew": {
+        "0": {
+          "nodeName": "0",
+          "mismatches": [
+            {
+              "type": "link",
+              "pos": 2,
+              "seq": "L",
+              "query": 3
+            },
+            {
+              "type": "link",
+              "pos": 3,
+              "seq": "L",
+              "query": 2
+            }
+          ]
+        }
+      },
+      "type": "read",
+      "read_id": 7,
+      "id": 7
+    }
+  ]
+}
