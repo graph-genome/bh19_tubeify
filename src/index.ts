@@ -27,13 +27,13 @@ export class Tubeify {
     }
 
     tileify(bin_json: any){
+        let matrix = [];
+
 
         let tubemap_json = {};
-        const nodes = Array.from(new Array(this.max_bin)).map((v, i) => { return { name: String(i + 1), sequenceLength: this.bin_length } }
-        );
-        tubemap_json["nodes"] = nodes;
-        tubemap_json["tracks"] = [{ id: 0, name: "REF", sequence: nodes.map(node => node.name) }];
-        tubemap_json["reads"] = reads;
+        tubemap_json["nodes"] = [{"name": "Layout", "sequenceLength": this.max_bin}];
+        tubemap_json["tracks"] = [{ id: 0, name: "REF", sequence: ["Layout"] }];
+        tubemap_json["reads"] = matrix;
 
         return tubemap_json
     }
