@@ -77,7 +77,7 @@ export class Tubeify {
 
         function newRead(first_node_offset: number, previous_bin_id: number, path_id: number): Read {
             // Placeholder of sequence_new.
-            let stub = {0: {nodeName: "0", mismatches: []}};
+            let stub = [{nodeName: "Layout", mismatches: []}];
 
             return {
                 firstNodeOffset: first_node_offset,

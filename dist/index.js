@@ -24,7 +24,7 @@ var Tubeify = /** @class */ (function () {
     Tubeify.prototype.tileify = function (bin_json) {
         var matrix = [];
         // Create reads for every contiguous segment of bins within a Path
-        bin_json[0].forEach(function (path) {
+        bin_json.forEach(function (path) {
             var temporary_reads = [];
             var first_node_offset = 0;
             var previous_bin_id = 0;
@@ -64,7 +64,7 @@ var Tubeify = /** @class */ (function () {
         return tubemap_json;
         function newRead(first_node_offset, previous_bin_id, path_id) {
             // Placeholder of sequence_new.
-            var stub = { 0: { nodeName: "0", mismatches: [] } };
+            var stub = [{ nodeName: "Layout", mismatches: [] }];
             return {
                 firstNodeOffset: first_node_offset,
                 finalNodeCoverLength: previous_bin_id - first_node_offset,

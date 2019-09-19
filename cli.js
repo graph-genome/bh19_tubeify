@@ -72,7 +72,9 @@ function convertToTile() {
     let data = global.data;
     let converter = new tubeify.Tubeify(parseInt(program.tiles), parseInt(program.bin_length), parseInt(program.bins));
     let json = converter.tileify(data);
-    console.log(JSON.stringify(json))
+    let out = JSON.stringify(json);
+    fs.writeFile('tests/recent.json', out);
+    console.log(out);
 
 }
 

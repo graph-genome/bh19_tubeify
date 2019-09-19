@@ -23,7 +23,7 @@ interface Read {
   mapping_quality: number;
   is_secondary: boolean;
   sequence: ["Layout"];
-  sequenceNew: any;
+  sequenceNew: any[];
   type: "read";
   read_id: number;
   id: number;
