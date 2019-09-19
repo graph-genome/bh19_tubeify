@@ -26,109 +26,81 @@ export class Tubeify {
         return tile_index
     }
 
+
     tileify(bin_json: any){
         let matrix = [];
 
         // Create reads for every contiguous segment of bins within a Path
-        // For one Path
-        bin_json.forEach((path) => {
-            let temporary_reads = []
+        bin_json.forEach((path) => { // For one Path
+            let temporary_reads = [];
             let first_node_offset = 0;
             let previous_bin_id = 0;
+
             // Iterate bins and look at id
             path.bins.forEach(bin => {
-                if (bin[0] === previous_bin_id + 1) {
-                    // Contiguous from the previous bin.
-                } else {
-                    // Not contiguous
-                    // Create a new read.
-                    
-                    // Placeholder of sequence_new.
-                    let sequence_new = {
-                        0: {
-                            nodeName: "0",
-                            mismatches: []
-                        }
-                    };
-                    
-                    // For each contiguous range, make a Read
-                    temporary_reads.push({
-                        firstNodeOffset: first_node_offset,
-                        finalNodeCoverLength: previous_bin_id - first_node_offset,
-                        mapping_quality: 60,
-                        is_secondary: false,
-                        sequence: ["Layout"], // Array.from(new Array(previous_bin_id - first_node_offset)).map((v, i) => i + first_node_offset),
-                        sequenceNew: sequence_new,
-                        type: "read",
-                        read_id: path.id,
-//                        name: bin.path_name, // + ":" + String(previous_id),
-                        id: path.id,
-                    });
+                // For each contiguous range, make a Read
+                if (bin[0] === previous_bin_id + 1) {// Contiguous from the previous bin: do nothing
+                } else {// Not contiguous: Create a new read.
+                    temporary_reads.push(newRead(first_node_offset, previous_bin_id, path.id));
                     first_node_offset = bin[0];
                 }
                 previous_bin_id = bin[0];
             });
-            // Placeholder of sequence_new.
-            let sequence_new = {
-                0: {
-                    nodeName: "0",
-                    mismatches: []
-                }
-            };
-            temporary_reads.push({
-                firstNodeOffset: first_node_offset,
-                finalNodeCoverLength: previous_bin_id - first_node_offset,
-                mapping_quality: 60,
-                is_secondary: false,
-                sequence: ["Layout"],
-                sequenceNew: sequence_new,
-                type: "read",
-                read_id: path.id,
-                id: path.id,
-            });
-
+            temporary_reads.push(newRead(first_node_offset, previous_bin_id, path.id));
 
             // Links: inside of one read:   
             // Input Example:  [ 5, 10]  meaning bins 5 and 10 are connected
-            path.links.forEach((link) => {
-                let lower_bound = 0;
-                let upper_bound = temporary_reads.length - 1;
-                let index = -1;
-                // Binary search
-                while (true) {
-                    let index = Math.floor((lower_bound + upper_bound) / 2);
-
-                    let left = temporary_reads[index].firstNodeOffset;
-                    let right = temporary_reads[index].firstNodeOffset + temporary_reads[index].finalNodeCoverLength;
-                    
-                    if (left <= link[0] && link[0] < right) {
-                        break;
-                    } else if (left > link[0]) {
-                        upper_bound = index; 
-                    } else {
-                        lower_bound = index;
-                    };
-                }
-
-                // Position = first bin_id -  firstNodeOffset relative coordinate   ex: 5 - 3 = 2
-                // Query = second bin_id    ex: 10
-                // Mismatch: type: “link”
-                // 0: {type: "link", pos: 2, seq: "LINK", query: “10”}
+            path["links"].forEach((link) => {
+                let index = binary_search(link[0], temporary_reads);
+                // Pos uses relative coordinates = first bin_id -  firstNodeOffset
                 temporary_reads[index].sequenceNew[0].mismatches.push({
                     type: "link", pos: link[0] - temporary_reads[index].firstNodeOffset, seq: "L", query: link[1]
-                })
-
-                // 0: {type: "link", pos: 10, seq: "LINK", query: “5”}
+                });
+                //make second link bidirectional
+                let buddy = binary_search(link[1], temporary_reads);
+                temporary_reads[buddy].sequenceNew[0].mismatches.push({
+                    type: "link", pos: link[1] - temporary_reads[buddy].firstNodeOffset, seq: "L", query: link[0]
+                });
             });
             matrix.concat(temporary_reads);
-        })
+        });
 
         let tubemap_json = {};
         tubemap_json["nodes"] = [{"name": "Layout", "sequenceLength": this.max_bin}];
         tubemap_json["tracks"] = [{ id: 0, name: "REF", sequence: ["Layout"] }];
         tubemap_json["reads"] = matrix;
 
-        return tubemap_json
+        return tubemap_json;
+
+        function newRead(first_node_offset: number, previous_bin_id: number, path_id: number) {
+            // Placeholder of sequence_new.
+            let stub = {0: {nodeName: "0", mismatches: []}};
+
+            return {
+                firstNodeOffset: first_node_offset,
+                finalNodeCoverLength: previous_bin_id - first_node_offset,
+                mapping_quality: 60,
+                is_secondary: false,
+                sequence: ["Layout"],
+                sequenceNew: stub,
+                type: "read",
+                read_id: path_id,
+                id: path_id
+            };
+        }
+        function binary_search(target, sorted_data){
+            // d=data, t=target, s=start, e=end, m=middle
+            //d[i][0] is the bin_id we are sorted and searching for
+            const binarySearch = (d, t, s, e) => {
+                const m = Math.floor((s + e)/2);
+                if (t == d[m][0]) return d[m];
+                if (e - 1 === s) return d[e][0] == t ? d[e] : d[s];  //return first read, unless e is exact match
+                if (t > d[m][0]) return binarySearch(d,t,m,e);
+                if (t < d[m][0]) return binarySearch(d,t,s,m);
+            };
+            return binarySearch(sorted_data, target, 0, sorted_data.length-1)
+        }
+
     }
 
     tubeify(bin_json: any) {

@@ -61,7 +61,7 @@ function readLines(input, interpret_func, callback) {
 // const data = JSON.parse(fs.readFileSync(program.json, 'utf8'));
 
 // If an input file is JSONP.
-global.data = []
+global.data = [];
 
 function interpreter(line) {
     let chunk = JSON.parse(line);
