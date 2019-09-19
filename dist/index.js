@@ -44,14 +44,15 @@ var Tubeify = /** @class */ (function () {
             // Input Example:  [ 5, 10]  meaning bins 5 and 10 are connected
             path["links"].forEach(function (link) {
                 var index = binary_search(link[0], temporary_reads);
-                // Pos uses relative coordinates = first bin_id -  firstNodeOffset
                 temporary_reads[index].sequenceNew[0].mismatches.push({
-                    type: "link", pos: link[0] - temporary_reads[index].firstNodeOffset, seq: "L", query: link[1]
+                    type: "link", query: link[1],
+                    pos: link[0], seq: "L" //absolute - temporary_reads[index].firstNodeOffset
                 });
                 //make second link bidirectional
                 var buddy = binary_search(link[1], temporary_reads);
                 temporary_reads[buddy].sequenceNew[0].mismatches.push({
-                    type: "link", pos: link[1] - temporary_reads[buddy].firstNodeOffset, seq: "L", query: link[0]
+                    type: "link", seq: "L", query: link[0],
+                    pos: link[1] //- temporary_reads[buddy].firstNodeOffset
                 });
             });
             matrix = matrix.concat(temporary_reads);
@@ -82,10 +83,10 @@ var Tubeify = /** @class */ (function () {
             function binarySearch(d, t, s, e) {
                 //d[i][0] is the bin_id we are sorted and searching for
                 var m = Math.floor((s + e) / 2);
-                if (t == d[m].firstNodeOffset || m === e)
+                if (t === d[m].firstNodeOffset || m === e)
                     return m;
                 if (e - 1 === s)
-                    return d[e].firstNodeOffset == t ? e : s; //return first read, unless e is exact match
+                    return d[e].firstNodeOffset === t ? e : s; //return first read, unless e is exact match
                 if (t > d[m].firstNodeOffset)
                     return binarySearch(d, t, m, e);
                 if (t < d[m].firstNodeOffset)
