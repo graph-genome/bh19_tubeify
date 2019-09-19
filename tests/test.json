@@ -1,11 +1,12 @@
 [
-{"path_name":"S288c.chrI","path_prefix":"S288c","path_suffix":"chrI","bin_id":"1","mean_cov":"0.000661955","mean_inv":"0","mean_pos":"1.81877e-05","begins":"[[-1,0,0,0,0]]","ends":"[[19,0,0,0,0]]"},
-{"path_name":"S288c.chrI","path_prefix":"S288c","path_suffix":"chrI","bin_id":"19","mean_cov":"0.681372","mean_inv":"0","mean_pos":"0.0211","begins":"[[1,0,0,0,0]]","ends":"[[20,0,0,0,0]]"},
-{"path_name":"S288c.chrI","path_prefix":"S288c","path_suffix":"chrI","bin_id":"20","mean_cov":"1.11841","mean_inv":"0.319348","mean_pos":"0.379924","begins":"[[19,0,0,0,0]]","ends":"[[21,0,0,0,0]]"},
-{"path_name":"S288c.chrI","path_prefix":"S288c","path_suffix":"chrI","bin_id":"21","mean_cov":"1.29765","mean_inv":"0.403163","mean_pos":"0.565905","begins":"[[20,0,0,0,0]]","ends":"[[22,0,0,0,0]]"},
-{"path_name":"S288c.chrI","path_prefix":"S288c","path_suffix":"chrI","bin_id":"22","mean_cov":"0.851789","mean_inv":"0.0050082","mean_pos":"0.488635","begins":"[[21,0,0,0,0]]","ends":"[[23,0,0,0,0]]"},
-{"path_name":"S288c.chrI","path_prefix":"S288c","path_suffix":"chrI","bin_id":"23","mean_cov":"0.978516","mean_inv":"0","mean_pos":"0.18353","begins":"[[22,0,0,0,0]]","ends":"[[24,0,0,0,0]]"},
-{"path_name":"S288c.chrI","path_prefix":"S288c","path_suffix":"chrI","bin_id":"24","mean_cov":"0.982194","mean_inv":"0","mean_pos":"0.244136","begins":"[[23,0,0,0,0]]","ends":"[[25,0,0,0,0]]"},
-{"path_name":"S288c.chrI","path_prefix":"S288c","path_suffix":"chrI","bin_id":"25","mean_cov":"0.983738","mean_inv":"0","mean_pos":"0.304903","begins":"[[24,0,0,0,0]]","ends":"[[26,0,0,0,0]]"},
-{"path_name":"S288c.chrI","path_prefix":"S288c","path_suffix":"chrI","bin_id":"26","mean_cov":"0.984253","mean_inv":"0","mean_pos":"0.365734","begins":"[[25,0,0,0,0]]","ends":"[[-1,0,0,0,0]]"}
+{"sample_name":"sue","path_name":"a","id":1,
+  "bins": [[1,"cov","inv","pos"],[2,"cov","inv","pos"],[3,"cov","inv","pos"],[4,"cov","inv","pos"]], "order": [1,2,3,4]},
+{"sample_name":"sue","path_name":"b","id":2,
+  "bins": [[1,"cov","inv","pos"],[2,"cov","inv","pos"],[4,"cov","inv","pos"]], "order": [1,2,4]},
+{"sample_name":"sue","path_name":"c","id":3,
+  "bins": [[1,"cov","inv","pos"],[-3,"cov","inv","pos"],[-2,"cov","inv","pos"],[4,"cov","inv","pos"]], "order": [1,3,2,4]},
+{"sample_name":"bob","path_name":"d","id":6,
+  "bins": [[3,"cov","inv","pos"],[4,"cov","inv","pos"]], "order": [1,2]},
+{"sample_name":"bob","path_name":"e","id":7,
+  "bins": [[1,"cov","inv","pos"],[2,"cov","inv","pos"]], "order": [3,4]}
 ]
