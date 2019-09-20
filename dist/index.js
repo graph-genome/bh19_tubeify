@@ -24,7 +24,7 @@ var Tubeify = /** @class */ (function () {
     Tubeify.prototype.tileify = function (bin_json) {
         var matrix = [];
         // Create reads for every contiguous segment of bins within a Path
-        bin_json.forEach(function (path) {
+        bin_json.forEach(function (path, path_i) {
             var temporary_reads = [];
             var first_node_offset = path.bins[0][0];
             var previous_bin_id = path.bins[0][0] - 1;
@@ -34,12 +34,12 @@ var Tubeify = /** @class */ (function () {
                 if (bin[0] === previous_bin_id + 1) { // Contiguous from the previous bin: do nothing
                 }
                 else { // Not contiguous: Create a new read.
-                    temporary_reads.push(newRead(first_node_offset, previous_bin_id, path.id));
+                    temporary_reads.push(newRead(first_node_offset, previous_bin_id, path, path_i));
                     first_node_offset = bin[0];
                 }
                 previous_bin_id = bin[0];
             });
-            temporary_reads.push(newRead(first_node_offset, previous_bin_id, path.id));
+            temporary_reads.push(newRead(first_node_offset, previous_bin_id, path, path_i));
             // Links: inside of one read:   
             // Input Example:  [ 5, 10]  meaning bins 5 and 10 are connected
             path["links"].forEach(function (link) {
@@ -64,19 +64,19 @@ var Tubeify = /** @class */ (function () {
             tracks: [{ id: 0, name: "REF", sequence: ["Layout"] }],
             reads: matrix
         };
-        function newRead(first_node_offset, previous_bin_id, path_id) {
+        function newRead(first_node_offset, previous_bin_id, path, path_i) {
             // Placeholder of sequence_new.
             var stub = [{ nodeName: "Layout", mismatches: [] }];
             return {
                 firstNodeOffset: first_node_offset,
-                finalNodeCoverLength: previous_bin_id - first_node_offset,
+                finalNodeCoverLength: previous_bin_id - first_node_offset + 1,
                 mapping_quality: Math.round(Math.random() * 100),
                 is_secondary: false,
                 sequence: ["Layout"],
                 sequenceNew: stub,
                 type: "read",
-                read_id: path_id,
-                id: path_id
+                name: path.path_name,
+                id: path_i
             };
         }
         function binary_search(target, sorted_data) {

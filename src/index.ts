@@ -32,8 +32,8 @@ export class Tubeify {
 
         // Create reads for every contiguous segment of bins within a Path
         bin_json.forEach((
-            path: {"sample_name":string,"path_name":string,"id":number,
-                "bins": number[][], "links": [number,number][]}) =>
+            path: {"sample_name":string,"path_name":string,
+                "bins": number[][], "links": [number,number][]}, path_i: number) =>
         { // For one Path
             let temporary_reads: Read[] = [];
             let first_node_offset = path.bins[0][0];
@@ -44,12 +44,12 @@ export class Tubeify {
                 // For each contiguous range, make a Read
                 if (bin[0] === previous_bin_id + 1) {// Contiguous from the previous bin: do nothing
                 } else {// Not contiguous: Create a new read.
-                    temporary_reads.push(newRead(first_node_offset, previous_bin_id, path.id));
+                    temporary_reads.push(newRead(first_node_offset, previous_bin_id, path, path_i));
                     first_node_offset = bin[0];
                 }
                 previous_bin_id = bin[0];
             });
-            temporary_reads.push(newRead(first_node_offset, previous_bin_id, path.id));
+            temporary_reads.push(newRead(first_node_offset, previous_bin_id, path, path_i));
 
             // Links: inside of one read:   
             // Input Example:  [ 5, 10]  meaning bins 5 and 10 are connected
@@ -77,20 +77,20 @@ export class Tubeify {
             reads: matrix
         };
 
-        function newRead(first_node_offset: number, previous_bin_id: number, path_id: number): Read {
+        function newRead(first_node_offset: number, previous_bin_id: number, path: {path_name:string}, path_i: number): Read {
             // Placeholder of sequence_new.
             let stub = [{nodeName: "Layout", mismatches: []}];
 
             return {
                 firstNodeOffset: first_node_offset,
-                finalNodeCoverLength: previous_bin_id - first_node_offset,
+                finalNodeCoverLength: previous_bin_id - first_node_offset +1, //inclusive
                 mapping_quality: Math.round(Math.random()*100),
                 is_secondary: false,
                 sequence: ["Layout"],
                 sequenceNew: stub,
                 type: "read",
-                read_id: path_id,
-                id: path_id
+                name: path.path_name,
+                id: path_i
             };
         }
         function binary_search(target: number, sorted_data: Read[]){

@@ -25,7 +25,7 @@ interface Read {
   sequence: ["Layout"];
   sequenceNew: any[];
   type: "read";
-  read_id: number;
+  name: string;
   id: number;
 }
   
