@@ -36,8 +36,8 @@ export class Tubeify {
                 "bins": number[][], "links": [number,number][]}) =>
         { // For one Path
             let temporary_reads: Read[] = [];
-            let first_node_offset = 0;
-            let previous_bin_id = 0;
+            let first_node_offset = path.bins[0][0];
+            let previous_bin_id = path.bins[0][0] - 1;
 
             // Iterate bins and look at id
             path.bins.forEach(bin => {
@@ -56,25 +56,26 @@ export class Tubeify {
             path["links"].forEach((link) => {
                 let index = binary_search(link[0], temporary_reads);
                 temporary_reads[index].sequenceNew[0].mismatches.push({
-                    type: "link", query: link[1],
-                    pos: link[0] , seq: "L" //absolute - temporary_reads[index].firstNodeOffset
+                    type: "link", query: link[1], seq: "L",
+                    pos: link[0]  //absolute - temporary_reads[index].firstNodeOffset
                 });
                 //make second link bidirectional
-                let buddy = binary_search(link[1], temporary_reads);
-                temporary_reads[buddy].sequenceNew[0].mismatches.push({
-                    type: "link", seq: "L", query: link[0],
-                    pos: link[1] //- temporary_reads[buddy].firstNodeOffset
-                });
+                if(link[0] !== 0){
+                    let buddy = binary_search(link[1], temporary_reads);
+                    temporary_reads[buddy].sequenceNew[0].mismatches.push({
+                        type: "link", seq: "L", query: link[0],
+                        pos: link[1] //- temporary_reads[buddy].firstNodeOffset
+                    });
+                }
             });
             matrix = matrix.concat(temporary_reads);
         });
 
-        let tubemap_json = {
+        return {
             nodes: [{"name": "Layout", "sequenceLength": this.max_bin}],
-            tracks: [{ id: 0, name: "REF", sequence: ["Layout"] }],
+            tracks: [{id: 0, name: "REF", sequence: ["Layout"]}],
             reads: matrix
         };
-        return tubemap_json;
 
         function newRead(first_node_offset: number, previous_bin_id: number, path_id: number): Read {
             // Placeholder of sequence_new.
@@ -83,7 +84,7 @@ export class Tubeify {
             return {
                 firstNodeOffset: first_node_offset,
                 finalNodeCoverLength: previous_bin_id - first_node_offset,
-                mapping_quality: 60,
+                mapping_quality: Math.round(Math.random()*100),
                 is_secondary: false,
                 sequence: ["Layout"],
                 sequenceNew: stub,

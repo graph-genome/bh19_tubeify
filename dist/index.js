@@ -26,8 +26,8 @@ var Tubeify = /** @class */ (function () {
         // Create reads for every contiguous segment of bins within a Path
         bin_json.forEach(function (path) {
             var temporary_reads = [];
-            var first_node_offset = 0;
-            var previous_bin_id = 0;
+            var first_node_offset = path.bins[0][0];
+            var previous_bin_id = path.bins[0][0] - 1;
             // Iterate bins and look at id
             path.bins.forEach(function (bin) {
                 // For each contiguous range, make a Read
@@ -45,31 +45,32 @@ var Tubeify = /** @class */ (function () {
             path["links"].forEach(function (link) {
                 var index = binary_search(link[0], temporary_reads);
                 temporary_reads[index].sequenceNew[0].mismatches.push({
-                    type: "link", query: link[1],
-                    pos: link[0], seq: "L" //absolute - temporary_reads[index].firstNodeOffset
+                    type: "link", query: link[1], seq: "L",
+                    pos: link[0] //absolute - temporary_reads[index].firstNodeOffset
                 });
                 //make second link bidirectional
-                var buddy = binary_search(link[1], temporary_reads);
-                temporary_reads[buddy].sequenceNew[0].mismatches.push({
-                    type: "link", seq: "L", query: link[0],
-                    pos: link[1] //- temporary_reads[buddy].firstNodeOffset
-                });
+                if (link[0] !== 0) {
+                    var buddy = binary_search(link[1], temporary_reads);
+                    temporary_reads[buddy].sequenceNew[0].mismatches.push({
+                        type: "link", seq: "L", query: link[0],
+                        pos: link[1] //- temporary_reads[buddy].firstNodeOffset
+                    });
+                }
             });
             matrix = matrix.concat(temporary_reads);
         });
-        var tubemap_json = {
+        return {
             nodes: [{ "name": "Layout", "sequenceLength": this.max_bin }],
             tracks: [{ id: 0, name: "REF", sequence: ["Layout"] }],
             reads: matrix
         };
-        return tubemap_json;
         function newRead(first_node_offset, previous_bin_id, path_id) {
             // Placeholder of sequence_new.
             var stub = [{ nodeName: "Layout", mismatches: [] }];
             return {
                 firstNodeOffset: first_node_offset,
                 finalNodeCoverLength: previous_bin_id - first_node_offset,
-                mapping_quality: 60,
+                mapping_quality: Math.round(Math.random() * 100),
                 is_secondary: false,
                 sequence: ["Layout"],
                 sequenceNew: stub,
