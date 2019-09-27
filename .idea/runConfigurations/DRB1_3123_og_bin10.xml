@@ -1,0 +1,7 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="DRB1-3123.og.bin10" type="NodeJSConfigurationType" node-parameters="cli.js -j tests/DRB1-3123.og.bin10.json --bins=1968 --bin_length=10 --tiles=1" working-dir="$PROJECT_DIR$">
+    <method v="2">
+      <option name="TypeScript.Before.Run" enabled="true" FAIL_ON_ERROR="true" CONFIG_PATH="$PROJECT_DIR$/tsconfig.json" />
+    </method>
+  </configuration>
+</component>

@@ -102,7 +102,11 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-.idea
+.idea/*.xml
+.idea/*.iml
+.idea/codeStyles
 .rts2*
 node_modules
 
+
+!.idea/runConfigurations

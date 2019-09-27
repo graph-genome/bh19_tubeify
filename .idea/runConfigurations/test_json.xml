@@ -1,0 +1,5 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="test.json" type="NodeJSConfigurationType" node-parameters="cli.js -j tests/test.json --bins=4 --bin_length=1000 --tiles=1" working-dir="$PROJECT_DIR$">
+    <method v="2" />
+  </configuration>
+</component>
