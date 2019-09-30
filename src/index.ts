@@ -2,34 +2,16 @@ export class Tubeify {
     private tile: number; // # of tiles in output. One tile corresponds to one bin if tiles === -1.
     private max_bin: number; // # of bins in input.
     private bin_length: number; // Nucleotide length of each bins.
-    tiles_range: number[]; // e.g. [0, 5, 10, 15, 20] according to max_bin and tile.
 
     constructor(tile: number, bin_length: number, max_bin: number) {
         this.tile = tile;
         this.max_bin = max_bin;
-        this.tiles_range = tile === -1 ?
-            Array.from(new Array(this.max_bin)).map((v, i) => i) :
-            Array.from(new Array(tile)).map((v, i) => Math.round(max_bin * i / tile));
         this.bin_length = bin_length || 0;
     }
 
-    tiles(bin: number) {
-        // Find the tile ID by binary search on tiled_range.
-        // let flag = false; // It should be replaced with a binary search at least.
-        let tile_index = this.tiles_range.length;
-        this.tiles_range.forEach((range, i) => {
-            if (range <= bin) {
-                tile_index = i;
-                return
-            }
-        });
-        return tile_index
-    }
-
-
     tileify(bin_json: any){
         let matrix: Read[] = [];
-
+        let id_count = 0;
         // Create reads for every contiguous segment of bins within a Path
         bin_json.forEach((
             path: {"sample_name":string,"path_name":string,
@@ -44,28 +26,32 @@ export class Tubeify {
                 // For each contiguous range, make a Read
                 if (bin[0] === previous_bin_id + 1) {// Contiguous from the previous bin: do nothing
                 } else {// Not contiguous: Create a new read.
-                    temporary_reads.push(newRead(first_node_offset, previous_bin_id, path, path_i));
+                    temporary_reads.push(newRead(first_node_offset, previous_bin_id, path, id_count++));
                     first_node_offset = bin[0];
                 }
                 previous_bin_id = bin[0];
+                this.max_bin = Math.max(this.max_bin, previous_bin_id + 1);  // make sure it's correct.
+                //TODO: if this.max_bin ever updates, we need to recompute tiles_range
             });
-            temporary_reads.push(newRead(first_node_offset, previous_bin_id, path, path_i));
+            temporary_reads.push(newRead(first_node_offset, previous_bin_id, path, id_count++));
 
             // Links: inside of one read:   
             // Input Example:  [ 5, 10]  meaning bins 5 and 10 are connected
             path["links"].forEach((link) => {
-                let index = binary_search(link[0], temporary_reads);
-                temporary_reads[index].sequenceNew[0].mismatches.push({
-                    type: "link", query: link[1], seq: "L",
-                    pos: link[0]  //absolute - temporary_reads[index].firstNodeOffset
-                });
-                //make second link bidirectional
-                if(link[0] !== 0){
-                    let buddy = binary_search(link[1], temporary_reads);
-                    temporary_reads[buddy].sequenceNew[0].mismatches.push({
-                        type: "link", seq: "L", query: link[0],
-                        pos: link[1] //- temporary_reads[buddy].firstNodeOffset
+                if(link[0] > link[1]) { //less common case of links going against the grain
+                    let index = binary_search(link[0], temporary_reads);
+                    temporary_reads[index].sequenceNew[0].mismatches.push({
+                        type: "link", query: link[1], seq: "L",
+                        pos: link[0]  //absolute - temporary_reads[index].firstNodeOffset
                     });
+                    //make second link bidirectional
+                    if (link[0] !== 0) {
+                        let buddy = binary_search(link[1], temporary_reads);
+                        temporary_reads[buddy].sequenceNew[0].mismatches.push({
+                            type: "link", seq: "L", query: link[0],
+                            pos: link[1] //- temporary_reads[buddy].firstNodeOffset
+                        });
+                    }
                 }
             });
             matrix = matrix.concat(temporary_reads);
@@ -83,8 +69,8 @@ export class Tubeify {
 
             return {
                 firstNodeOffset: first_node_offset,
-                finalNodeCoverLength: previous_bin_id - first_node_offset +1, //inclusive
-                mapping_quality: Math.round(Math.random()*100),
+                finalNodeCoverLength: previous_bin_id ,//absolute within one node //- first_node_offset +1, //inclusive
+                mapping_quality: first_node_offset % 100, //stable color
                 is_secondary: false,
                 sequence: ["Layout"],
                 sequenceNew: stub,
@@ -124,7 +110,7 @@ export class Tubeify {
                 path_starts[bin.name] = bin.bin_id;
             }
             if (max_bin_id < bin.bin_id) {
-                max_bin_id = bin.bin_id; 
+                max_bin_id = bin.bin_id;
             }
         });
 

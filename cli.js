@@ -22,7 +22,7 @@ console.log(tubes.tiles(290)) //29
 console.log(tubes.tiles(300)) //289
 */
 program
-    .option('-b, --bins <bins>', '# of bins are provided in total')
+    .option('-b, --bins <bins>', '(optional) # of bins are provided in total', defaultValue=1)
     .option('-t, --tiles <tiles>', '# of tiles, default: -1 (one bin equals one tile)')
     .option('-l, --bin_length <length>', 'Length of nucleotide sequence per bin')
     .option('-j, --json <file>', 'odgi-bin JSON file')
@@ -73,8 +73,12 @@ function convertToTile() {
     let converter = new tubeify.Tubeify(parseInt(program.tiles), parseInt(program.bin_length), parseInt(program.bins));
     let json = converter.tileify(data);
     let out = JSON.stringify(json);
-    fs.writeFile('tests/recent.json', out);
-    console.log(out);
+    if(program.tile_json){
+        fs.writeFile(program.tile_json, out);
+    }else{
+        fs.writeFile('tests/recent.json', out);
+    }
+    // console.log(out);
 
 }
 

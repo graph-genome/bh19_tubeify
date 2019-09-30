@@ -4,24 +4,10 @@ var Tubeify = /** @class */ (function () {
     function Tubeify(tile, bin_length, max_bin) {
         this.tile = tile;
         this.max_bin = max_bin;
-        this.tiles_range = tile === -1 ?
-            Array.from(new Array(this.max_bin)).map(function (v, i) { return i; }) :
-            Array.from(new Array(tile)).map(function (v, i) { return Math.round(max_bin * i / tile); });
         this.bin_length = bin_length || 0;
     }
-    Tubeify.prototype.tiles = function (bin) {
-        // Find the tile ID by binary search on tiled_range.
-        // let flag = false; // It should be replaced with a binary search at least.
-        var tile_index = this.tiles_range.length;
-        this.tiles_range.forEach(function (range, i) {
-            if (range <= bin) {
-                tile_index = i;
-                return;
-            }
-        });
-        return tile_index;
-    };
     Tubeify.prototype.tileify = function (bin_json) {
+        var _this = this;
         var matrix = [];
         var id_count = 0;
         // Create reads for every contiguous segment of bins within a Path
@@ -39,6 +25,8 @@ var Tubeify = /** @class */ (function () {
                     first_node_offset = bin[0];
                 }
                 previous_bin_id = bin[0];
+                _this.max_bin = Math.max(_this.max_bin, previous_bin_id + 1); // make sure it's correct.
+                //TODO: if this.max_bin ever updates, we need to recompute tiles_range
             });
             temporary_reads.push(newRead(first_node_offset, previous_bin_id, path, id_count++));
             // Links: inside of one read:   

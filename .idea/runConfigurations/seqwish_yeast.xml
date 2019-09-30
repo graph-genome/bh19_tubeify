@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="seqwish_yeast" type="NodeJSConfigurationType" node-parameters="cli.js -j tests/seqwish_yeast_l10k.og.bin1000.json --bins=13507 --bin_length=1000 --tiles=1" working-dir="$PROJECT_DIR$">
+  <configuration default="false" name="seqwish_yeast" type="NodeJSConfigurationType" node-parameters="cli.js -j tests/seqwish_yeast_l10k.og.bin1000.json --bin_length=1000 --tiles=1 --tile_json=&quot;tests/recent-yeast.json&quot;" working-dir="$PROJECT_DIR$">
     <method v="2" />
   </configuration>
 </component>
