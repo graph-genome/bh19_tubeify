@@ -23,6 +23,7 @@ var Tubeify = /** @class */ (function () {
     };
     Tubeify.prototype.tileify = function (bin_json) {
         var matrix = [];
+        var id_count = 0;
         // Create reads for every contiguous segment of bins within a Path
         bin_json.forEach(function (path, path_i) {
             var temporary_reads = [];
@@ -34,27 +35,29 @@ var Tubeify = /** @class */ (function () {
                 if (bin[0] === previous_bin_id + 1) { // Contiguous from the previous bin: do nothing
                 }
                 else { // Not contiguous: Create a new read.
-                    temporary_reads.push(newRead(first_node_offset, previous_bin_id, path, path_i));
+                    temporary_reads.push(newRead(first_node_offset, previous_bin_id, path, id_count++));
                     first_node_offset = bin[0];
                 }
                 previous_bin_id = bin[0];
             });
-            temporary_reads.push(newRead(first_node_offset, previous_bin_id, path, path_i));
+            temporary_reads.push(newRead(first_node_offset, previous_bin_id, path, id_count++));
             // Links: inside of one read:   
             // Input Example:  [ 5, 10]  meaning bins 5 and 10 are connected
             path["links"].forEach(function (link) {
-                var index = binary_search(link[0], temporary_reads);
-                temporary_reads[index].sequenceNew[0].mismatches.push({
-                    type: "link", query: link[1], seq: "L",
-                    pos: link[0] //absolute - temporary_reads[index].firstNodeOffset
-                });
-                //make second link bidirectional
-                if (link[0] !== 0) {
-                    var buddy = binary_search(link[1], temporary_reads);
-                    temporary_reads[buddy].sequenceNew[0].mismatches.push({
-                        type: "link", seq: "L", query: link[0],
-                        pos: link[1] //- temporary_reads[buddy].firstNodeOffset
+                if (link[0] > link[1]) { //less common case of links going against the grain
+                    var index = binary_search(link[0], temporary_reads);
+                    temporary_reads[index].sequenceNew[0].mismatches.push({
+                        type: "link", query: link[1], seq: "L",
+                        pos: link[0] //absolute - temporary_reads[index].firstNodeOffset
                     });
+                    //make second link bidirectional
+                    if (link[0] !== 0) {
+                        var buddy = binary_search(link[1], temporary_reads);
+                        temporary_reads[buddy].sequenceNew[0].mismatches.push({
+                            type: "link", seq: "L", query: link[0],
+                            pos: link[1] //- temporary_reads[buddy].firstNodeOffset
+                        });
+                    }
                 }
             });
             matrix = matrix.concat(temporary_reads);
@@ -69,8 +72,8 @@ var Tubeify = /** @class */ (function () {
             var stub = [{ nodeName: "Layout", mismatches: [] }];
             return {
                 firstNodeOffset: first_node_offset,
-                finalNodeCoverLength: previous_bin_id - first_node_offset + 1,
-                mapping_quality: Math.round(Math.random() * 100),
+                finalNodeCoverLength: previous_bin_id,
+                mapping_quality: first_node_offset % 100,
                 is_secondary: false,
                 sequence: ["Layout"],
                 sequenceNew: stub,
