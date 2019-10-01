@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="SIXREF" type="CompoundRunConfigurationType">
+    <toRun name="sixref 1k" type="NodeJSConfigurationType" />
+    <toRun name="sixref 10k " type="NodeJSConfigurationType" />
+    <toRun name="sixref 100" type="NodeJSConfigurationType" />
+    <toRun name="sixref 100k" type="NodeJSConfigurationType" />
+    <method v="2" />
+  </configuration>
+</component>

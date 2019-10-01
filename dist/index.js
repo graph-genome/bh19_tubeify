@@ -32,14 +32,16 @@ var Tubeify = /** @class */ (function () {
             // Links: inside of one read:   
             // Input Example:  [ 5, 10]  meaning bins 5 and 10 are connected
             path["links"].forEach(function (link) {
-                if (link[0] > link[1]) { //less common case of links going against the grain
+                var distance = Math.abs(link[0] - link[1]);
+                if (distance > 20) { //Don't create internal links, that defeats the point of binning
+                    //if(link[0] > link[1]) { //less common case of links going against the grain
                     var index = binary_search(link[0], temporary_reads);
                     temporary_reads[index].sequenceNew[0].mismatches.push({
                         type: "link", query: link[1], seq: "L",
                         pos: link[0] //absolute - temporary_reads[index].firstNodeOffset
                     });
                     //make second link bidirectional
-                    if (link[0] !== 0) {
+                    if (link[0] !== 0 && link[1] !== 0) {
                         var buddy = binary_search(link[1], temporary_reads);
                         temporary_reads[buddy].sequenceNew[0].mismatches.push({
                             type: "link", seq: "L", query: link[0],
@@ -61,7 +63,7 @@ var Tubeify = /** @class */ (function () {
             return {
                 firstNodeOffset: first_node_offset,
                 finalNodeCoverLength: previous_bin_id,
-                mapping_quality: first_node_offset % 100,
+                mapping_quality: hashCode(path.path_name) % 100,
                 is_secondary: false,
                 sequence: ["Layout"],
                 sequenceNew: stub,
@@ -91,4 +93,15 @@ var Tubeify = /** @class */ (function () {
     return Tubeify;
 }());
 exports.Tubeify = Tubeify;
+function hashCode(obj) {
+    //https://stackoverflow.com/a/8076436/3067894
+    var hash = 0;
+    for (var i = 0; i < obj.length; i++) {
+        var character = obj.charCodeAt(i);
+        hash = ((hash << 5) - hash) + character;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash);
+}
+exports.hashCode = hashCode;
 //# sourceMappingURL=index.js.map
