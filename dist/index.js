@@ -54,7 +54,7 @@ var Tubeify = /** @class */ (function () {
         });
         return {
             nodes: [{ "name": "Layout", "sequenceLength": this.max_bin }],
-            tracks: [{ id: 0, name: "REF", sequence: ["Layout"] }],
+            tracks: [{ id: 0, name: "REF", indexOfFirstBase: 0, sequence: ["Layout"] }],
             reads: matrix
         };
         function newRead(first_node_offset, previous_bin_id, path, path_i) {
