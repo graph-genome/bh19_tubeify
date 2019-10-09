@@ -18,22 +18,23 @@ var Tubeify = /** @class */ (function () {
             // Iterate bins and look at id
             path.bins.forEach(function (bin) {
                 // For each contiguous range, make a Read
+                //tuple(bin_id, coverage, inversion_rate, mean_pos)
                 if (bin[0] === previous_bin_id + 1) { // Contiguous from the previous bin: do nothing
                 }
                 else { // Not contiguous: Create a new read.
-                    temporary_reads.push(newRead(first_node_offset, previous_bin_id, path, id_count++));
+                    temporary_reads.push(newRead(first_node_offset, previous_bin_id, path, path_i, id_count++, bin[3], bin[2]));
                     first_node_offset = bin[0];
                 }
                 previous_bin_id = bin[0];
                 _this.max_bin = Math.max(_this.max_bin, previous_bin_id + 1); // make sure it's correct.
                 //TODO: if this.max_bin ever updates, we need to recompute tiles_range
             });
-            temporary_reads.push(newRead(first_node_offset, previous_bin_id, path, id_count++));
+            temporary_reads.push(newRead(first_node_offset, previous_bin_id, path, path_i, id_count++, .999, 0));
             // Links: inside of one read:   
             // Input Example:  [ 5, 10]  meaning bins 5 and 10 are connected
             path["links"].forEach(function (link) {
                 var distance = Math.abs(link[0] - link[1]);
-                if (distance > 20) { //Don't create internal links, that defeats the point of binning
+                if (distance > 10) { //Don't create internal links, that defeats the point of binning
                     //if(link[0] > link[1]) { //less common case of links going against the grain
                     var index = binary_search(link[0], temporary_reads);
                     temporary_reads[index].sequenceNew[0].mismatches.push({
@@ -57,19 +58,21 @@ var Tubeify = /** @class */ (function () {
             tracks: [{ id: 0, name: "REF", indexOfFirstBase: 0, sequence: ["Layout"] }],
             reads: matrix
         };
-        function newRead(first_node_offset, previous_bin_id, path, path_i) {
+        function newRead(first_node_offset, previous_bin_id, path, path_i, id_count, mean_pos, inversion_rate) {
             // Placeholder of sequence_new.
             var stub = [{ nodeName: "Layout", mismatches: [] }];
             return {
                 firstNodeOffset: first_node_offset,
                 finalNodeCoverLength: previous_bin_id,
-                mapping_quality: hashCode(path.path_name) % 100,
+                mapping_quality: path_i,
                 is_secondary: false,
                 sequence: ["Layout"],
                 sequenceNew: stub,
                 type: "read",
                 name: path.path_name,
-                id: path_i
+                id: id_count,
+                mean_pos: mean_pos,
+                inversion_rate: inversion_rate
             };
         }
         function binary_search(target, sorted_data) {

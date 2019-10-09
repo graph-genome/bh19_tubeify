@@ -27,5 +27,7 @@ interface Read {
   type: "read";
   name: string;
   id: number;
+  mean_pos: number;
+  inversion_rate: number;
 }
   
