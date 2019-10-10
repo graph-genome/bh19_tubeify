@@ -26,6 +26,7 @@ program
     .option('-t, --tiles <tiles>', '# of tiles, default: -1 (one bin equals one tile)')
     .option('-l, --bin_length <length>', 'Length of nucleotide sequence per bin')
     .option('-j, --json <file>', 'odgi-bin JSON file')
+    .option('-p, --jsonp <file>', 'odgi-bin JSONP file')
     .option('-k, --tile_json <file>', 'tile JSON file')
     .version('0.0.1', '-v, --version')
     .parse(process.argv);
@@ -56,22 +57,22 @@ function readLines(input, func, callback) {
     }
 
 // console.log(program)
-// If an input file is JSON.
-// const data = JSON.parse(fs.readFileSync(program.json, 'utf8'));
-
 // If an input file is JSONP.
 global.data = []
 function func(line) {
     global.data.push(JSON.parse(line))
 }
 
-function callback() {
+
+function callback(from_json) {
     let data = global.data
     let input = []
     data.forEach(item => {
         item.bin_id = parseInt(item.bin_id) + 1
-        // item.begins = JSON.parse(item["begins"])
-        // item.ends = JSON.parse(item["ends"])
+        if (from_json) {
+          item.begins = JSON.parse(item["begins"])
+          item.ends = JSON.parse(item["ends"])
+        }
     });
     let tube = new tubeify.Tubeify(parseInt(program.tiles), parseInt(program.bin_length),  parseInt(program.bins));
     // let tube = new tubeify.Tubeify(30, 300, 1000); For given 300 bins, we would like to have 30 tiles.
@@ -79,8 +80,14 @@ function callback() {
     console.log(JSON.stringify(json))    
 }
 
-var input_data = fs.createReadStream(program.json);
-readLines(input_data, func, callback);
+if (program.jsonp) {
+  var input_data = fs.createReadStream(program.jsonp);
+  readLines(input_data, func, callback);
+} else {
+  //  If an input file is JSON.
+  global.data = JSON.parse(fs.readFileSync(program.json, 'utf8'));
+  callback(true)
+}
 
 /*
 
