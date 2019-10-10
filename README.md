@@ -8,6 +8,7 @@ Tubeify can use as both a CLI tool and a JavaScript library.
 
 ```bash
 npm install -g csv2json
+npm install
 csv2json -t tests/test.tsv  > tests/test.json
 npm run build
 node cli.js -j tests/test.json -b 25 -l 1000 -t -1
