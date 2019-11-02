@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "commander": "^3.0.1",
-    "csv-parse": "^4.4.5",
+    "csv-parse": "^4.4.6",
     "parse-jsonp": "^2.0.0"
   }
 }
